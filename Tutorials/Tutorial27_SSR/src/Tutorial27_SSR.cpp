@@ -39,9 +39,6 @@ static uint32_t gPlaneNumber   = 1;
 static float    gPlaneSize     = 75.0f;
 static float    gRRP_Intensity = 0.2f;
 
-static uint32_t gWidth  = 1440;
-static uint32_t gHeight = 810;
-
 static Diligent::float3 gCamPos{20.0f, -2.0f, 0.9f};
 
 static const float gCamearNear = 0.1f;
@@ -511,6 +508,12 @@ void Tutorial27_SSR::Initialize(const SampleInitInfo& InitInfo)
 {
     SampleBase::Initialize(InitInfo);
 
+    m_Camera.SetPos(gCamPos);
+    m_Camera.SetRotation(PI_F / 2.f, 0);
+    m_Camera.SetRotationSpeed(0.005f);
+    m_Camera.SetMoveSpeed(5.f);
+    m_Camera.SetSpeedUpScales(5.f, 10.f);
+
     CreatePipelineState();
     CreateBuffers();
     LoadTexture();
@@ -712,7 +715,7 @@ void Tutorial27_SSR::CreatePipelineState()
 
         m_pPSOs[gStrGBuffer]->GetStaticVariableByName(SHADER_TYPE_VERTEX, "cbPass")->Set(m_Buffers[gStrCameraCBV]);
         m_pPSOs[gStrGBuffer]->GetStaticVariableByName(SHADER_TYPE_VERTEX, "cbPerObject")->Set(m_Buffers[gStrGBufferCBV]);
-        //m_pPSOs[gStrGBuffer]->GetStaticVariableByName(SHADER_TYPE_PIXEL, "cbPass")->Set(m_Buffers[gStrCameraCBV]);
+        m_pPSOs[gStrGBuffer]->GetStaticVariableByName(SHADER_TYPE_PIXEL, "cbPass")->Set(m_Buffers[gStrCameraCBV]);
         m_pPSOs[gStrGBuffer]->GetStaticVariableByName(SHADER_TYPE_PIXEL, "cbPerObject")->Set(m_Buffers[gStrGBufferCBV]);
         m_pPSOs[gStrGBuffer]->CreateShaderResourceBinding(&m_ShaderResourceBindings[gStrGBuffer], true);
     }
@@ -1185,8 +1188,8 @@ void Tutorial27_SSR::CreateBuffers()
         TextureDesc GBufferATexDesc;
         GBufferATexDesc.Name      = gStrGBufferA;
         GBufferATexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferATexDesc.Width     = gWidth;
-        GBufferATexDesc.Height    = gHeight;
+        GBufferATexDesc.Width     = mWidth;
+        GBufferATexDesc.Height    = mHeight;
         GBufferATexDesc.MipLevels = 1;
         GBufferATexDesc.Format    = gGBufferFormatA;
         GBufferATexDesc.Usage     = USAGE_DEFAULT;
@@ -1198,8 +1201,8 @@ void Tutorial27_SSR::CreateBuffers()
         TextureDesc GBufferBTexDesc;
         GBufferBTexDesc.Name      = gStrGBufferB;
         GBufferBTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferBTexDesc.Width     = gWidth;
-        GBufferBTexDesc.Height    = gHeight;
+        GBufferBTexDesc.Width     = mWidth;
+        GBufferBTexDesc.Height    = mHeight;
         GBufferBTexDesc.MipLevels = 1;
         GBufferBTexDesc.Format    = gGBufferFormatB;
         GBufferBTexDesc.Usage     = USAGE_DEFAULT;
@@ -1211,8 +1214,8 @@ void Tutorial27_SSR::CreateBuffers()
         TextureDesc GBufferCTexDesc;
         GBufferCTexDesc.Name      = gStrGBufferC;
         GBufferCTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferCTexDesc.Width     = gWidth;
-        GBufferCTexDesc.Height    = gHeight;
+        GBufferCTexDesc.Width     = mWidth;
+        GBufferCTexDesc.Height    = mHeight;
         GBufferCTexDesc.MipLevels = 1;
         GBufferCTexDesc.Format    = gGBufferFormatC;
         GBufferCTexDesc.Usage     = USAGE_DEFAULT;
@@ -1224,8 +1227,8 @@ void Tutorial27_SSR::CreateBuffers()
         TextureDesc GBufferDTexDesc;
         GBufferDTexDesc.Name      = gStrGBufferD;
         GBufferDTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferDTexDesc.Width     = gWidth;
-        GBufferDTexDesc.Height    = gHeight;
+        GBufferDTexDesc.Width     = mWidth;
+        GBufferDTexDesc.Height    = mHeight;
         GBufferDTexDesc.MipLevels = 1;
         GBufferDTexDesc.Format    = gGBufferFormatD;
         GBufferDTexDesc.Usage     = USAGE_DEFAULT;
@@ -1237,8 +1240,8 @@ void Tutorial27_SSR::CreateBuffers()
         TextureDesc GBufferDepthTexDesc;
         GBufferDepthTexDesc.Name      = gStrGBufferDepth;
         GBufferDepthTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferDepthTexDesc.Width     = gWidth;
-        GBufferDepthTexDesc.Height    = gHeight;
+        GBufferDepthTexDesc.Width     = mWidth;
+        GBufferDepthTexDesc.Height    = mHeight;
         GBufferDepthTexDesc.MipLevels = 1;
         GBufferDepthTexDesc.Format    = gGBufferFormatDepth;
         GBufferDepthTexDesc.Usage     = USAGE_DEFAULT;
@@ -1250,8 +1253,8 @@ void Tutorial27_SSR::CreateBuffers()
         TextureDesc GRenderSceneTexDesc;
         GRenderSceneTexDesc.Name      = gStrRenderSceneBuffer;
         GRenderSceneTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GRenderSceneTexDesc.Width     = gWidth;
-        GRenderSceneTexDesc.Height    = gHeight;
+        GRenderSceneTexDesc.Width     = mWidth;
+        GRenderSceneTexDesc.Height    = mHeight;
         GRenderSceneTexDesc.MipLevels = 1;
         GRenderSceneTexDesc.Format    = gRenderSceneBufferFormatDepth;
         GRenderSceneTexDesc.Usage     = USAGE_DEFAULT;
@@ -1263,8 +1266,8 @@ void Tutorial27_SSR::CreateBuffers()
         TextureDesc GPPRReflectionTexDesc;
         GPPRReflectionTexDesc.Name      = gStrPPRReflection;
         GPPRReflectionTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GPPRReflectionTexDesc.Width     = gWidth;
-        GPPRReflectionTexDesc.Height    = gHeight;
+        GPPRReflectionTexDesc.Width     = mWidth;
+        GPPRReflectionTexDesc.Height    = mHeight;
         GPPRReflectionTexDesc.MipLevels = 1;
         GPPRReflectionTexDesc.Format    = gRenderSceneBufferFormatDepth;
         GPPRReflectionTexDesc.Usage     = USAGE_DEFAULT;
@@ -1310,8 +1313,8 @@ void Tutorial27_SSR::CreateBuffers()
 
     {
         std::vector<uint32_t> gInitializeVal;
-        gInitializeVal.reserve(gWidth * gHeight);
-        for (uint32_t i = 0; i < gWidth * gHeight; i++)
+        gInitializeVal.reserve(mWidth * mHeight);
+        for (uint32_t i = 0; i < mWidth * mHeight; i++)
         {
             gInitializeVal.push_back(UINT32_MAX);
         }
@@ -1322,7 +1325,7 @@ void Tutorial27_SSR::CreateBuffers()
         IntermediateBuffDesc.BindFlags         = BIND_SHADER_RESOURCE | BIND_UNORDERED_ACCESS;
         IntermediateBuffDesc.Mode              = BUFFER_MODE_FORMATTED;
         IntermediateBuffDesc.ElementByteStride = sizeof(int);
-        IntermediateBuffDesc.Size              = sizeof(int) * gWidth * gHeight;
+        IntermediateBuffDesc.Size              = sizeof(int) * mWidth * mHeight;
         BufferData BData;
         BData.pData    = gInitializeVal.data();
         BData.DataSize = IntermediateBuffDesc.Size;
@@ -1628,7 +1631,7 @@ void Tutorial27_SSR::Render()
     gUniformExtendedCamData.mProjMat        = mPassCbData.Proj;
     gUniformExtendedCamData.mViewProjMat    = mPassCbData.ViewProj;
     gUniformExtendedCamData.mInvViewProjMat = mPassCbData.InvViewProj;
-    gUniformExtendedCamData.mViewPortSize   = float4(static_cast<float>(gWidth), static_cast<float>(gHeight), 0.0, 0.0);
+    gUniformExtendedCamData.mViewPortSize   = float4(static_cast<float>(mWidth), static_cast<float>(mHeight), 0.0, 0.0);
 
     UniformPlaneInfoData gUniformPlaneInfoData;
     gUniformPlaneInfoData.numPlanes                = gPlaneNumber;
@@ -1669,7 +1672,7 @@ void Tutorial27_SSR::Render()
         }
 
         DispatchComputeAttribs DispatAttribsProjection;
-        DispatAttribsProjection.ThreadGroupCountX = (Uint32)ceilf(gWidth * gHeight / 128.0f);
+        DispatAttribsProjection.ThreadGroupCountX = (Uint32)ceilf(mWidth * mHeight / 128.0f);
         DispatAttribsProjection.ThreadGroupCountY = (Uint32)1;
         DispatAttribsProjection.ThreadGroupCountZ = (Uint32)1;
 
@@ -1757,6 +1760,13 @@ void Tutorial27_SSR::Update(double CurrTime, double ElapsedTime)
 {
     SampleBase::Update(CurrTime, ElapsedTime);
 
+    m_Camera.Update(m_InputController, static_cast<float>(ElapsedTime));
+    {
+        const auto& mouseState = m_InputController.GetMouseState();
+        m_LastMouseState = mouseState;
+    }
+
+#if 0
     float4x4 view = float4x4(-4.37113883e-08f, -0.00000000f, -1.00000000f, 0.00000000f,
                              0.00000000f, 1.00000000f, -0.00000000f, 0.00000000f,
                              1.00000000f, -0.00000000f, -4.37113883e-08f, 0.00000000f,
@@ -1765,6 +1775,10 @@ void Tutorial27_SSR::Update(double CurrTime, double ElapsedTime)
                              0.00000000f, 1.77777779f, 0.00000000f, 0.00000000f,
                              0.00000000f, 0.00000000f, 1.00009990f, 1.00000000f,
                              0.00000000f, 0.00000000f, -0.100009993f, 0.00000000f);
+#else
+    float4x4 view = m_Camera.GetViewMatrix();
+    float4x4 proj = m_Camera.GetProjMatrix();
+#endif
 
     mPassCbData.PreViewProj = mPassCbData.ViewProj;
     mPassCbData.View        = view;
@@ -1776,12 +1790,12 @@ void Tutorial27_SSR::Update(double CurrTime, double ElapsedTime)
     ;
 
     mPassCbData.EyePosW          = gCamPos;
-    mPassCbData.RenderTargetSize = float4((float)gWidth, (float)gHeight, 1.0f / gWidth, 1.0f / gHeight);
+    mPassCbData.RenderTargetSize = float4((float)mWidth, (float)mHeight, 1.0f / mWidth, 1.0f / mHeight);
     mPassCbData.NearZ            = gCamearNear;
     mPassCbData.FarZ             = gCamearFar;
     mPassCbData.TotalTime        = 0;
     mPassCbData.DeltaTime        = 0;
-    mPassCbData.ViewPortSize     = {(float)gWidth, (float)gWidth, 0.0f, 0.0f};
+    mPassCbData.ViewPortSize     = {(float)mWidth, (float)mWidth, 0.0f, 0.0f};
 
     mPassCbData.AmbientLight = {0.25f, 0.25f, 0.35f, 1.0f};
 
@@ -1855,6 +1869,18 @@ void Tutorial27_SSR::Update(double CurrTime, double ElapsedTime)
     mHolepatchingUniformData.useNormalMap             = 0.0f;
     mHolepatchingUniformData.intensity                = 1.0f;
     mHolepatchingUniformData.useFadeEffect            = 0.0f;
+}
+
+void Tutorial27_SSR::WindowResize(Uint32 Width, Uint32 Height)
+{
+    mWidth  = Width;
+    mHeight = Height;
+    
+    float NearPlane   = gCamearNear;
+    float FarPlane    = gCamearFar;
+    float AspectRatio = static_cast<float>(Width) / static_cast<float>(Height);
+    m_Camera.SetProjAttribs(NearPlane, FarPlane, AspectRatio, PI_F / 4.f,
+                            m_pSwapChain->GetDesc().PreTransform, m_pDevice->GetDeviceInfo().IsGLDevice());
 }
 
 } // namespace Diligent

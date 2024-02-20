@@ -48,7 +48,7 @@ struct TVertex
 struct TMeshSDFDescriptor
 {
     float3 Center;
-    float    Extent;
+    float  Extent;
 
     int Resolution;
     int pad1;

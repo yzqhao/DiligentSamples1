@@ -4,6 +4,7 @@
 #include "SampleBase.hpp"
 #include "BasicMath.hpp"
 #include "GLTFLoader.hpp"
+#include "FirstPersonCamera.hpp"
 
 #include <map>
 
@@ -163,6 +164,7 @@ public:
 
     virtual void Render() override final;
     virtual void Update(double CurrTime, double ElapsedTime) override final;
+    virtual void WindowResize(Uint32 Width, Uint32 Height) override final;
 
     virtual const Char* GetSampleName() const override final { return "Tutorial27 : Forward"; }
 
@@ -178,6 +180,12 @@ private:
     std::map<std::string, RefCntAutoPtr<ITexture>>               m_Textures;
     std::map<std::string, RefCntAutoPtr<ITextureView>>           m_TextureViews;
     std::map<std::string, RefCntAutoPtr<IShaderResourceBinding>> m_ShaderResourceBindings;
+
+    FirstPersonCamera m_Camera;
+    MouseState        m_LastMouseState;
+    
+    uint32_t mWidth = 1890;
+    uint32_t mHeight = 1080;
 
     GLTF::Model* m_Model1;
     GLTF::Model* m_Model2;

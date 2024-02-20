@@ -10,14 +10,14 @@ template <class T> bool Equals(T lhs, T rhs) { return lhs + std::numeric_limits<
 
 namespace Diligent
 {
-const float3 MinPerElem(const float3& vec0, const float3& vec1)
+static const float3 MinPerElem(const float3& vec0, const float3& vec1)
 {
     return float3(((float)vec0.x < vec1.x) ? vec0.x : vec1.x,
                   ((float)vec0.y < vec1.y) ? vec0.y : vec1.y,
                   ((float)vec0.z < vec1.z) ? vec0.z : vec1.z);
 }
 
-const float3 MaxPerElem(const float3& vec0, const float3& vec1)
+static const float3 MaxPerElem(const float3& vec0, const float3& vec1)
 {
     return float3(((float)vec0.x > vec1.x) ? vec0.x : vec1.x,
                   ((float)vec0.y > vec1.y) ? vec0.y : vec1.y,
@@ -130,7 +130,7 @@ typedef struct Scene
     //GltfMeshStreamData* geom;
     ShadowData     pShadow;
     GLTF::Model*   m_Model;
-    uint32_t       mIndexCnt;
+    uint32_t       mDrawArgCount;
     MaterialFlags* materialFlags;
     char**         textures;
     char**         normalMaps;

@@ -43,6 +43,7 @@ float getDistance(float3 planeNormal, float3 planeCenter, float3 worldPos)
 
 inline float4 getCol(in float4x4 M, const uint i) { return float4(M[0][i], M[1][i], M[2][i], M[3][i]); }
 
+
 bool intersectPlane(uint index, float3 worldPos, float2 fragUV, out float4 reflectedPos)
 { 
 	PlaneInfo thisPlane = planeInfo[index];
@@ -262,7 +263,7 @@ void csmain(uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex, uint3 GTi
 	float2 offset;
 
 
-	// float minDist = 1000000.0;
+	// float minDist = 1000000.0; 
 	
 
 	for(uint i = 0; i < numPlanes; i++)

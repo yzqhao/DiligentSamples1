@@ -1,5 +1,6 @@
 #pragma once
 
+#define uint unsigned
 
 #define MAX_TEXTURE_UNITS 256U
 
@@ -51,11 +52,7 @@
 
 // This function is used to get the offset of the current material base index depending
 // on the type of geometry and on the culling view.
-#define BaseMaterialBuffer(alpha, viewID) (((viewID)*2 + ((alpha) ? 0 : 1)) * MAX_DRAWS_INDIRECT)
-
-
-
-#define MATERIAL_BUFFER_SIZE (MAX_DRAWS_INDIRECT * 2 * NUM_CULLING_VIEWPORTS)
+#define BaseMaterialBuffer(alpha, viewID) (((viewID) * 2 + ((alpha) ? 0 : 1)) * MAX_DRAWS_INDIRECT)
 
 struct RootConstant
 {

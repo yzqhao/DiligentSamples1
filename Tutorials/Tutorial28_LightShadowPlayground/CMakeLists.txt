@@ -16,8 +16,15 @@ set(INCLUDE
 )
 
 set(SHADERS
-    #assets/cube.vsh
-    #assets/cube.psh
+    assets/batchCompaction.hlsl
+    assets/clearVisibilityBuffers.hlsl
+    assets/cull_resources.h.hlsl
+    assets/Packing.h.hlsl
+    assets/Shader_Defs.h.hlsl
+    assets/triangleFiltering.hlsl
+    assets/vb_resources.h.hlsl
+    assets/visibilityBufferPass_vert.hlsl
+    assets/visibilityBufferPass_frag.hlsl
 )
 
 set(ASSETS
@@ -26,3 +33,7 @@ set(ASSETS
 
 add_sample_app("Tutorial28_LightShadowPlayground" "DiligentSamples/Tutorials" "${SOURCE}" "${INCLUDE}" "${SHADERS}" "${ASSETS}")
 target_link_libraries(Tutorial28_LightShadowPlayground PRIVATE Diligent-TextureLoader Diligent-AssetLoader)
+
+if(MSVC)
+    target_compile_definitions(Tutorial28_LightShadowPlayground PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()

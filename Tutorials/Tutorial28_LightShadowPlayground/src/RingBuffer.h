@@ -1,12 +1,18 @@
 
 #pragma once
 
+#include "AdvancedMath.hpp"
+
+#include <cassert>
+
+namespace Diligent
+{
 /************************************************************************/
 /* RING BUFFER MANAGEMENT											  */
 /************************************************************************/
 typedef struct GPURingBuffer
 {
-    ID3D12Resource* pBuffer;
+    IBuffer* pBuffer;
 
     uint32_t mBufferAlignment;
     uint64_t mMaxBufferSize;
@@ -16,7 +22,7 @@ typedef struct GPURingBuffer
 
 typedef struct GPURingBufferOffset
 {
-    ID3D12Resource* pBuffer;
+    IBuffer* pBuffer;
     uint64_t        mOffset;
 } GPURingBufferOffset;
 /*
@@ -37,9 +43,9 @@ static inline void addUniformGPURingBuffer(uint32_t requiredUniformBufferSize, G
 {
     GPURingBuffer* pRingBuffer = (GPURingBuffer*)malloc(sizeof(GPURingBuffer));
 
-    const uint32_t uniformBufferAlignment = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+    //const uint32_t uniformBufferAlignment = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
     const uint32_t maxUniformBufferSize   = requiredUniformBufferSize;
-    pRingBuffer->mBufferAlignment         = uniformBufferAlignment;
+    //pRingBuffer->mBufferAlignment         = uniformBufferAlignment;
     pRingBuffer->mMaxBufferSize           = maxUniformBufferSize;
 
     *ppRingBuffer = pRingBuffer;
@@ -64,7 +70,7 @@ static inline GPURingBufferOffset getGPURingBufferOffset(GPURingBuffer* pRingBuf
 
     if (alignedSize > pRingBuffer->mMaxBufferSize)
     {
-        ASSERT(false && "Ring Buffer too small for memory requirement");
+        assert(false && "Ring Buffer too small for memory requirement");
         return {NULL, 0};
     }
 
@@ -78,3 +84,4 @@ static inline GPURingBufferOffset getGPURingBufferOffset(GPURingBuffer* pRingBuf
 
     return ret;
 }
+} // namespace Diligent

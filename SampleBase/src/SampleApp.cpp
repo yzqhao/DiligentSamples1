@@ -343,6 +343,9 @@ void SampleApp::InitializeDiligentEngine(const NativeWindow* pWindow)
             EngineGLCreateInfo EngineCI;
             EngineCI.Window = *pWindow;
 
+#    if PLATFORM_EMSCRIPTEN
+            EngineCI.WebGLAttribs.PowerPreference = WEBGL_POWER_PREFERENCE_HIGH_PERFORMANCE;
+#    endif
             if (m_ValidationLevel >= 0)
                 EngineCI.SetValidationLevel(static_cast<VALIDATION_LEVEL>(m_ValidationLevel));
 
@@ -765,7 +768,8 @@ SampleApp::CommandLineStatus SampleApp::ProcessCommandLine(int argc, const char*
     ArgsParser.Parse("vsync", m_bVSync);
     ArgsParser.Parse("non_separable_progs", m_bForceNonSeprblProgs);
 
-
+    // set d3d12 
+    m_DeviceType = RENDER_DEVICE_TYPE_D3D12;
     if (m_DeviceType == RENDER_DEVICE_TYPE_UNDEFINED)
     {
         SelectDeviceType();

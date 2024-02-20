@@ -845,7 +845,7 @@ static void SetMaterials(Scene* pScene)
     const size_t defaultAlbedoSize = strlen(DEFAULT_ALBEDO) + 1;
     const size_t defaultNormalSize = strlen(DEFAULT_NORMAL) + 1;
     const size_t defaultSpecSize   = strlen(DEFAULT_SPEC) + 1;
-    for (uint32_t i = index; i < pScene->mIndexCnt / 3; i++)
+    for (uint32_t i = index; i < pScene->mDrawArgCount / 3; i++)
     {
         pScene->materialFlags[i] = MATERIAL_FLAG_TWO_SIDED | MATERIAL_FLAG_ALPHA_TESTED;
 
@@ -880,9 +880,10 @@ Scene* loadScene(const char* fileName, float scale, float offsetX, float offsetY
         };
 
     GLTF::ModelCreateInfo ModelCI;
-    ModelCI.FileName             = "Models/Sponza.gltf";
+    ModelCI.FileName             = fileName;
     ModelCI.pResourceManager     = nullptr;
     ModelCI.ComputeBoundingBoxes = false;
+    ModelCI.KeepSource           = true;
     ModelCI.VertexAttributes     = DefaultVertexAttributes.data();
     ModelCI.NumVertexAttributes  = (Uint32)DefaultVertexAttributes.size();
     scene->m_Model               = new GLTF::Model(pDevice, pImmediateContext, ModelCI);
@@ -893,11 +894,11 @@ Scene* loadScene(const char* fileName, float scale, float offsetX, float offsetY
     std::unordered_set<std::string> alphaTestMaterials;
     SetAlphaTestMaterials(alphaTestMaterials);
 
-    uint drawArgCount    = 0; //scene->geom->m_Indices.GetIndicesCount() / 3;
-    scene->materialFlags = (MaterialFlags*)malloc(drawArgCount * sizeof(MaterialFlags));
-    scene->textures      = (char**)malloc(drawArgCount * sizeof(char*));
-    scene->normalMaps    = (char**)malloc(drawArgCount * sizeof(char*));
-    scene->specularMaps  = (char**)malloc(drawArgCount * sizeof(char*));
+    scene->mDrawArgCount = (Uint32)scene->m_Model->Meshes.size();
+    scene->materialFlags = (MaterialFlags*)malloc(scene->mDrawArgCount * sizeof(MaterialFlags));
+    scene->textures      = (char**)malloc(scene->mDrawArgCount * sizeof(char*));
+    scene->normalMaps    = (char**)malloc(scene->mDrawArgCount * sizeof(char*));
+    scene->specularMaps  = (char**)malloc(scene->mDrawArgCount * sizeof(char*));
 
     SetMaterials(scene);
 
@@ -906,7 +907,7 @@ Scene* loadScene(const char* fileName, float scale, float offsetX, float offsetY
 
 void removeScene(Scene* scene)
 {
-    for (uint32_t i = 0; i < scene->mIndexCnt / 3; ++i)
+    for (uint32_t i = 0; i < scene->mDrawArgCount / 3; ++i)
     {
         if (scene->textures[i])
         {
@@ -950,8 +951,8 @@ void createClusters(bool twoSided, const Scene* pScene, IndirectDrawIndexArgumen
 
     Triangle triangleCache[CLUSTER_SIZE * 3];
 
-    uint32_t* indices   = (uint32_t*)pScene->pShadow.pIndices;
-    float3*   positions = (float3*)pScene->pShadow.pAttributes[PS_ATTRIBUTE_MAX];
+    uint32_t* indices   = (uint32_t*)pScene->m_Model->m_IndexData.data();
+    float*   positions = (float*)pScene->m_Model->m_VertexData[0].data();
 
     const int triangleCount = draw->mIndexCount / 3;
     const int clusterCount  = (triangleCount + CLUSTER_SIZE - 1) / CLUSTER_SIZE;
@@ -970,12 +971,13 @@ void createClusters(bool twoSided, const Scene* pScene, IndirectDrawIndexArgumen
         // Load all triangles into our local cache
         for (int triangleIndex = clusterStart; triangleIndex < clusterEnd; ++triangleIndex)
         {
-            triangleCache[triangleIndex - clusterStart].vtx[0] =
-                makeVec3(positions[indices[draw->mStartIndex + triangleIndex * 3]]);
-            triangleCache[triangleIndex - clusterStart].vtx[1] =
-                makeVec3(positions[indices[draw->mStartIndex + triangleIndex * 3 + 1]]);
-            triangleCache[triangleIndex - clusterStart].vtx[2] =
-                makeVec3(positions[indices[draw->mStartIndex + triangleIndex * 3 + 2]]);
+            int idx1 = indices[draw->mStartIndex + triangleIndex * 3] * 11;
+            int idx2 = indices[draw->mStartIndex + triangleIndex * 3 + 1] * 11;
+            int idx3 = indices[draw->mStartIndex + triangleIndex * 3 + 2] * 11;
+
+            triangleCache[triangleIndex - clusterStart].vtx[0] = float3(positions[idx1], positions[idx1 + 1], positions[idx1 + 2]);
+            triangleCache[triangleIndex - clusterStart].vtx[1] = float3(positions[idx2], positions[idx2 + 1], positions[idx2 + 2]);
+            triangleCache[triangleIndex - clusterStart].vtx[2] = float3(positions[idx3], positions[idx3 + 1], positions[idx3 + 2]);
         }
 
         float3 aabbMin = float3(INFINITY, INFINITY, INFINITY);

@@ -4,6 +4,7 @@
 #include "SampleBase.hpp"
 #include "Mesh.h"
 #include "GLTFLoader.hpp"
+#include "FirstPersonCamera.hpp"
 
 #include <map>
 
@@ -34,10 +35,10 @@ struct PassConstants
     float    DeltaTime = 0.0f;
     float4   ViewPortSize;
 
-    float4   gFogColor;
-    float    gFogStart;
-    float    gFogRange;
-    float2   cbPassPad2;
+    float4 gFogColor;
+    float  gFogStart;
+    float  gFogRange;
+    float2 cbPassPad2;
 };
 
 struct MaterialData
@@ -141,6 +142,7 @@ public:
 
     virtual void Render() override final;
     virtual void Update(double CurrTime, double ElapsedTime) override final;
+    virtual void WindowResize(Uint32 Width, Uint32 Height) override final;
 
     virtual const Char* GetSampleName() const override final { return "Tutorial29 : TBDR"; }
 
@@ -160,6 +162,12 @@ private:
     std::map<std::string, RefCntAutoPtr<ITexture>>               m_Textures;
     std::map<std::string, RefCntAutoPtr<ITextureView>>           m_TextureViews;
     std::map<std::string, RefCntAutoPtr<IShaderResourceBinding>> m_ShaderResourceBindings;
+
+    FirstPersonCamera m_Camera;
+    MouseState        m_LastMouseState;
+
+    uint32_t   mWidth = 1280;
+    uint32_t   mHeight = 720;
 
     GLTF::Model* m_Model;
 

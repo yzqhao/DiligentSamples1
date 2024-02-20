@@ -1,0 +1,2 @@
+3dpea.gltf filter=lfs diff=lfs merge=lfs -text
+biyunlong.stl filter=lfs diff=lfs merge=lfs -text

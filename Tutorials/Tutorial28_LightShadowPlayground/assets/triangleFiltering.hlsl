@@ -19,8 +19,8 @@ groupshared uint workGroupIndexCount[NUM_CULLING_VIEWPORTS];
 #define GreaterThan(A, B)      ((A) > (B))
 #define LessThan(A, B)         ((A) < (B))
 
-bool2 And(const bool2 a, const bool2 b)
-{ return a && b; }
+//bool2 And(const bool2 a, const bool2 b)
+//{ return a && b; }
 inline int LoadByte(ByteAddressBuffer buff, int address)
 { return buff.Load(address);}
 inline int4 LoadByte4(ByteAddressBuffer buff, int address)
@@ -179,7 +179,7 @@ void main(uint3 inGroupId : SV_GroupThreadID, uint3 groupId : SV_GroupID)
 			workGroupIndexCount[i] = 0u;
 	}
 
-	GroupMemoryBarrier();
+	GroupMemoryBarrierWithGroupSync();
 
 	bool cull[NUM_CULLING_VIEWPORTS];
 	uint threadOutputSlot[NUM_CULLING_VIEWPORTS];
@@ -227,7 +227,7 @@ void main(uint3 inGroupId : SV_GroupThreadID, uint3 groupId : SV_GroupID)
 		}
 	}
 
-    GroupMemoryBarrier();
+    GroupMemoryBarrierWithGroupSync();
 
 	uint accumBatchDrawIndex = smallBatchDataBuffer[groupId.x].mAccumDrawIndex;
 
@@ -240,7 +240,7 @@ void main(uint3 inGroupId : SV_GroupThreadID, uint3 groupId : SV_GroupID)
 		}
 	}
 
-	AllMemoryBarrier();
+	AllMemoryBarrierWithGroupSync();
 
 	[unroll(NUM_CULLING_VIEWPORTS)]
 	for (uint j = 0; j < NUM_CULLING_VIEWPORTS; ++j)

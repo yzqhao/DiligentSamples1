@@ -51,26 +51,14 @@ void main(uint3 threadID : SV_DispatchThreadID)
 				InterlockedAdd(indirectDrawArgsBufferAlpha[j][DRAW_COUNTER_SLOT_POS], 1, slot);
 				indirectDrawArgsBufferAlpha[j][slot * INDIRECT_DRAW_ARGUMENTS_STRUCT_NUM_ELEMENTS + indexCountOffset] = numIndices[j];
 				indirectDrawArgsBufferAlpha[j][slot * INDIRECT_DRAW_ARGUMENTS_STRUCT_NUM_ELEMENTS + startIndexOffset] = startIndex;
-				
-				#if defined(INDIRECT_COMMAND_BUFFER)
-					// Encode draw commands in ICB
-					uint startInstance = AtomicLoad(indirectDrawArgsBufferAlpha[j][slot * INDIRECT_DRAW_ARGUMENTS_STRUCT_NUM_ELEMENTS + startInstanceOffset]);
-					cmdDrawIndexedInstanced(icbAlpha[j], slot, PRIMITIVE_TYPE_TRIANGLE, filteredIndicesBuffer[j], numIndices[j], startIndex, 0, 1, startInstance);
-				#endif
 			}
 			else
 			{
 				InterlockedAdd(indirectDrawArgsBufferNoAlpha[j][DRAW_COUNTER_SLOT_POS], 1, slot);
 				indirectDrawArgsBufferNoAlpha[j][slot * INDIRECT_DRAW_ARGUMENTS_STRUCT_NUM_ELEMENTS + indexCountOffset] = numIndices[j];
 				indirectDrawArgsBufferNoAlpha[j][slot * INDIRECT_DRAW_ARGUMENTS_STRUCT_NUM_ELEMENTS + startIndexOffset] = startIndex;
-				
-				#if defined(INDIRECT_COMMAND_BUFFER)
-					// Encode draw commands in ICB
-					uint startInstance = AtomicLoad(indirectDrawArgsBufferNoAlpha[j][slot * INDIRECT_DRAW_ARGUMENTS_STRUCT_NUM_ELEMENTS + startInstanceOffset]);
-					cmdDrawIndexedInstanced(icbNoAlpha[j], slot, PRIMITIVE_TYPE_TRIANGLE, filteredIndicesBuffer[j], numIndices[j], startIndex, 0, 1, startInstance);
-				#endif
 			}
-			StoreByte(indirectMaterialBuffer, (baseMatSlot + slot) << 2, matID);
+			indirectMaterialBuffer[baseMatSlot + slot] = matID;
 		}
 	}
 }

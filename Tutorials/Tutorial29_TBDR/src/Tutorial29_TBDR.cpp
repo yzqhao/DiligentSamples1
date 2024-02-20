@@ -9,10 +9,7 @@
 namespace Diligent
 {
 
-static uint32_t gWidth  = 1280;
-static uint32_t gHeight = 720;
-
-static Diligent::float3 gCamPos{20.0f, -2.0f, 0.9f};
+static Diligent::float3 gCamPos{-1.8f, 13.0f, -22.0f};
 
 static const float gCamearNear = 0.1f;
 static const float gCamearFar  = 1000.0f;
@@ -50,9 +47,9 @@ static const char* gStrGBufferCBV  = "GBufferCBV";
 static const char* gStrCameraCBV   = "CameraCBV";
 static const char* gStrMaterialCBV = "MaterialCBV";
 
-static const char* gStrSSAO    = "SSAO";
-static const char* gStrSSAOCBV   = "SSAOCBV";
-static const char* gStrSSAOCameraCBV = "SSAOCameraCBV";
+static const char* gStrSSAO            = "SSAO";
+static const char* gStrSSAOCBV         = "SSAOCBV";
+static const char* gStrSSAOCameraCBV   = "SSAOCameraCBV";
 static const char* gStrSSAOSettingHCBV = "SSAOSettingHCBV";
 static const char* gStrSSAOSettingVCBV = "SSAOSettingVCBV";
 
@@ -86,10 +83,10 @@ static const char* gStrSSAOTempBuffer    = "SSAOTempBuffer";
 static const char* gStrSSAOTempBufferSRV = "SSAOTempBufferSRV";
 static const char* gStrSSAOTempBufferUAV = "SSAOTempBufferUAV";
 
-static const char* gStrRenderSceneBuffer    = "RenderSceneBuffer";
-static const char* gStrRenderSceneBufferSRV = "RenderSceneBufferSRV";
-static const char* gStrRenderSceneBufferRTV = "RenderSceneBufferRTV";
-static const char* gStrRenderSceneCameraCBV = "RenderSceneCameraCBV";
+static const char* gStrRenderSceneBuffer     = "RenderSceneBuffer";
+static const char* gStrRenderSceneBufferSRV  = "RenderSceneBufferSRV";
+static const char* gStrRenderSceneBufferRTV  = "RenderSceneBufferRTV";
+static const char* gStrRenderSceneCameraCBV  = "RenderSceneCameraCBV";
 static const char* gStrRenderSceneLightCBV   = "RenderSceneLightCBV";
 static const char* gStrTiledBaseLightCullRSV = "TiledBaseLightCullingRSV";
 
@@ -104,17 +101,18 @@ static const char* gStrTiledDepthDebugTextureSRV = "TiledDepthDebugTextureSRV";
 static const char* gStrTiledDepthDebugTextureUAV = "TiledDepthDebugTextureUAV";
 
 static const char* gStrTAAPass = "TAAPass";
+static const char* gStrTAACBV  = "gStrTAACBV";
 
-static TEXTURE_FORMAT gGBufferFormatA               = TEX_FORMAT_RGBA32_FLOAT;
-static TEXTURE_FORMAT gGBufferFormatB               = TEX_FORMAT_RGBA8_SNORM;
-static TEXTURE_FORMAT gGBufferFormatC               = TEX_FORMAT_RGBA32_FLOAT;
-static TEXTURE_FORMAT gGBufferFormatD               = TEX_FORMAT_RGBA8_UNORM;
-static TEXTURE_FORMAT gGBufferFormatE               = TEX_FORMAT_RG16_FLOAT;
-static TEXTURE_FORMAT gGBufferFormatF               = TEX_FORMAT_RGBA8_UNORM;
-static TEXTURE_FORMAT gGBufferFormatDepth           = TEX_FORMAT_D24_UNORM_S8_UINT;
-static TEXTURE_FORMAT gRenderSceneBufferFormat      = TEX_FORMAT_RGBA32_FLOAT;
-static TEXTURE_FORMAT gSSAOFormat                   = TEX_FORMAT_R16_UNORM;
-static TEXTURE_FORMAT gTileDebugFormat              = TEX_FORMAT_RG16_UNORM;
+static TEXTURE_FORMAT gGBufferFormatA          = TEX_FORMAT_RGBA32_FLOAT;
+static TEXTURE_FORMAT gGBufferFormatB          = TEX_FORMAT_RGBA8_SNORM;
+static TEXTURE_FORMAT gGBufferFormatC          = TEX_FORMAT_RGBA32_FLOAT;
+static TEXTURE_FORMAT gGBufferFormatD          = TEX_FORMAT_RGBA8_UNORM;
+static TEXTURE_FORMAT gGBufferFormatE          = TEX_FORMAT_RG16_FLOAT;
+static TEXTURE_FORMAT gGBufferFormatF          = TEX_FORMAT_RGBA8_UNORM;
+static TEXTURE_FORMAT gGBufferFormatDepth      = TEX_FORMAT_D24_UNORM_S8_UINT;
+static TEXTURE_FORMAT gRenderSceneBufferFormat = TEX_FORMAT_RGBA32_FLOAT;
+static TEXTURE_FORMAT gSSAOFormat              = TEX_FORMAT_R16_UNORM;
+static TEXTURE_FORMAT gTileDebugFormat         = TEX_FORMAT_RG16_UNORM;
 
 SampleBase* CreateSample()
 {
@@ -136,11 +134,11 @@ void Tutorial29_TBDR::InitLightData()
             float ColorZ = distr(eng);
 
             LightParameters LightShaderParameter;
-            LightShaderParameter.Color     = {ColorX, ColorY, ColorZ};
-            LightShaderParameter.Intensity = 10.0f;
-            LightShaderParameter.Position  = float3(i * 4.0f + 1.0f, 1.0f, j * 4.0f);
-            LightShaderParameter.Range     = 3.0f;
-            LightShaderParameter.LightType = ELightType::PointLight;
+            LightShaderParameter.Color        = {ColorX, ColorY, ColorZ};
+            LightShaderParameter.Intensity    = 10.0f;
+            LightShaderParameter.Position     = float3(i * 4.0f + 1.0f, 1.0f, j * 4.0f);
+            LightShaderParameter.Range        = 3.0f;
+            LightShaderParameter.LightType    = ELightType::PointLight;
             LightShaderParameter.ShadowMapIdx = -1;
 
             mLightParameters.push_back(LightShaderParameter);
@@ -398,19 +396,19 @@ void Tutorial29_TBDR::CreatePipelineState()
         PSODesc.PipelineType                       = PIPELINE_TYPE_COMPUTE;
         PSODesc.ResourceLayout.DefaultVariableType = SHADER_RESOURCE_VARIABLE_TYPE_MUTABLE;
 
-        PSODesc.Name                                 = gStrHorzBlur;
+        PSODesc.Name                            = gStrHorzBlur;
         ShaderResourceVariableDesc TexMapVars[] = {
             {SHADER_TYPE_COMPUTE, "cbBlurSettings", SHADER_RESOURCE_VARIABLE_TYPE_STATIC},
             {SHADER_TYPE_COMPUTE, "InputTexture", SHADER_RESOURCE_VARIABLE_TYPE_MUTABLE},
             {SHADER_TYPE_COMPUTE, "OutputTexture", SHADER_RESOURCE_VARIABLE_TYPE_MUTABLE},
         };
         // clang-format on
-        PSOCreateInfo.PSODesc.ResourceLayout.Variables            = TexMapVars;
+        PSOCreateInfo.PSODesc.ResourceLayout.Variables    = TexMapVars;
         PSOCreateInfo.PSODesc.ResourceLayout.NumVariables = _countof(TexMapVars);
-        PSOCreateInfo.pCS                                         = pHorzBlurCS;
+        PSOCreateInfo.pCS                                 = pHorzBlurCS;
         m_pDevice->CreateComputePipelineState(PSOCreateInfo, &m_pPSOs[gStrHorzBlur]);
 
-        PSODesc.Name                            = gStrVertBlur;
+        PSODesc.Name                                      = gStrVertBlur;
         PSOCreateInfo.PSODesc.ResourceLayout.Variables    = TexMapVars;
         PSOCreateInfo.PSODesc.ResourceLayout.NumVariables = _countof(TexMapVars);
         PSOCreateInfo.pCS                                 = pHorzBlurCS;
@@ -472,7 +470,7 @@ void Tutorial29_TBDR::CreatePipelineState()
         PSOCreateInfo.pCS                                 = pTiledBaseLightCullingCS;
         m_pDevice->CreateComputePipelineState(PSOCreateInfo, &m_pPSOs[gStrTiledBaseLightCulling]);
 
-        
+
         BufferDesc LightParametersBuffDesc;
         LightParametersBuffDesc.Name              = "LightParameters Constants buffer";
         LightParametersBuffDesc.Usage             = USAGE_DEFAULT;
@@ -494,9 +492,9 @@ void Tutorial29_TBDR::CreatePipelineState()
         LightCommonDataBuffDesc.Size           = sizeof(LightCommonData);
         m_pDevice->CreateBuffer(LightCommonDataBuffDesc, nullptr, &m_Buffers[gStrLightCommonData]);
 
-        
-		Uint32 MaxTileCountX = (Uint32)ceilf(gWidth / float(TILE_BLOCK_SIZE));
-        Uint32 MaxTileCountY = (Uint32)ceilf(gHeight / float(TILE_BLOCK_SIZE));
+
+        Uint32 MaxTileCountX = (Uint32)ceilf(mWidth / float(TILE_BLOCK_SIZE));
+        Uint32 MaxTileCountY = (Uint32)ceilf(mHeight / float(TILE_BLOCK_SIZE));
 
         BufferDesc BuffDesc;
         BuffDesc.Name              = "TileLightInfo Constants buffer";
@@ -506,7 +504,7 @@ void Tutorial29_TBDR::CreatePipelineState()
         BuffDesc.ElementByteStride = sizeof(TileLightInfo);
         BuffDesc.Size              = sizeof(TileLightInfo) * MaxTileCountX * MaxTileCountY;
         m_pDevice->CreateBuffer(BuffDesc, nullptr, &m_Buffers[gStrTiledBaseLightCulling]);
-        IBufferView* pUAV = m_Buffers[gStrTiledBaseLightCulling]->GetDefaultView(BUFFER_VIEW_UNORDERED_ACCESS);
+        IBufferView* pUAV                        = m_Buffers[gStrTiledBaseLightCulling]->GetDefaultView(BUFFER_VIEW_UNORDERED_ACCESS);
         m_BufferViews[gStrTiledBaseLightCullRSV] = m_Buffers[gStrTiledBaseLightCulling]->GetDefaultView(BUFFER_VIEW_SHADER_RESOURCE);
 
         m_pPSOs[gStrTiledBaseLightCulling]->GetStaticVariableByName(SHADER_TYPE_COMPUTE, "cbPass")->Set(m_Buffers[gStrCameraCBV]);
@@ -625,7 +623,6 @@ void Tutorial29_TBDR::CreatePipelineState()
     }
 
     // TAA
-    if (true)
     {
         GraphicsPipelineStateCreateInfo PSOCreateInfo;
 
@@ -669,6 +666,8 @@ void Tutorial29_TBDR::CreatePipelineState()
             //ShaderCI.HLSLVersion     = {6, 1};
             //ShaderCI.ShaderCompiler  = SHADER_COMPILER_DXC;
             m_pDevice->CreateShader(ShaderCI, &pPS);
+            
+            CreateUniformBuffer(m_pDevice, sizeof(PassConstants), "cbPass CB", &m_Buffers[gStrTAACBV]);
         }
 
         // clang-format off
@@ -691,6 +690,7 @@ void Tutorial29_TBDR::CreatePipelineState()
         // clang-format off
         ShaderResourceVariableDesc Vars[] = 
         {
+            {SHADER_TYPE_PIXEL, "cbPass", SHADER_RESOURCE_VARIABLE_TYPE_STATIC},
             {SHADER_TYPE_PIXEL, "ColorTexture", SHADER_RESOURCE_VARIABLE_TYPE_MUTABLE},
             {SHADER_TYPE_PIXEL, "PrevColorTexture", SHADER_RESOURCE_VARIABLE_TYPE_MUTABLE},
             {SHADER_TYPE_PIXEL, "VelocityGBuffer", SHADER_RESOURCE_VARIABLE_TYPE_MUTABLE},
@@ -716,6 +716,7 @@ void Tutorial29_TBDR::CreatePipelineState()
 
         m_pDevice->CreateGraphicsPipelineState(PSOCreateInfo, &m_pPSOs[gStrTAAPass]);
 
+        m_pPSOs[gStrTAAPass]->GetStaticVariableByName(SHADER_TYPE_PIXEL, "cbPass")->Set(m_Buffers[gStrTAACBV]);
         m_pPSOs[gStrTAAPass]->CreateShaderResourceBinding(&m_ShaderResourceBindings[gStrTAAPass], true);
     }
 }
@@ -726,8 +727,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc GBufferATexDesc;
         GBufferATexDesc.Name      = gStrGBufferA;
         GBufferATexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferATexDesc.Width     = gWidth;
-        GBufferATexDesc.Height    = gHeight;
+        GBufferATexDesc.Width     = mWidth;
+        GBufferATexDesc.Height    = mHeight;
         GBufferATexDesc.MipLevels = 1;
         GBufferATexDesc.Format    = gGBufferFormatA;
         GBufferATexDesc.Usage     = USAGE_DEFAULT;
@@ -739,8 +740,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc GBufferBTexDesc;
         GBufferBTexDesc.Name      = gStrGBufferB;
         GBufferBTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferBTexDesc.Width     = gWidth;
-        GBufferBTexDesc.Height    = gHeight;
+        GBufferBTexDesc.Width     = mWidth;
+        GBufferBTexDesc.Height    = mHeight;
         GBufferBTexDesc.MipLevels = 1;
         GBufferBTexDesc.Format    = gGBufferFormatB;
         GBufferBTexDesc.Usage     = USAGE_DEFAULT;
@@ -752,8 +753,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc GBufferCTexDesc;
         GBufferCTexDesc.Name      = gStrGBufferC;
         GBufferCTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferCTexDesc.Width     = gWidth;
-        GBufferCTexDesc.Height    = gHeight;
+        GBufferCTexDesc.Width     = mWidth;
+        GBufferCTexDesc.Height    = mHeight;
         GBufferCTexDesc.MipLevels = 1;
         GBufferCTexDesc.Format    = gGBufferFormatC;
         GBufferCTexDesc.Usage     = USAGE_DEFAULT;
@@ -765,8 +766,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc GBufferDTexDesc;
         GBufferDTexDesc.Name      = gStrGBufferD;
         GBufferDTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferDTexDesc.Width     = gWidth;
-        GBufferDTexDesc.Height    = gHeight;
+        GBufferDTexDesc.Width     = mWidth;
+        GBufferDTexDesc.Height    = mHeight;
         GBufferDTexDesc.MipLevels = 1;
         GBufferDTexDesc.Format    = gGBufferFormatD;
         GBufferDTexDesc.Usage     = USAGE_DEFAULT;
@@ -778,8 +779,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc GBufferETexDesc;
         GBufferETexDesc.Name      = gStrGBufferE;
         GBufferETexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferETexDesc.Width     = gWidth;
-        GBufferETexDesc.Height    = gHeight;
+        GBufferETexDesc.Width     = mWidth;
+        GBufferETexDesc.Height    = mHeight;
         GBufferETexDesc.MipLevels = 1;
         GBufferETexDesc.Format    = gGBufferFormatE;
         GBufferETexDesc.Usage     = USAGE_DEFAULT;
@@ -791,8 +792,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc GBufferFTexDesc;
         GBufferFTexDesc.Name      = gStrGBufferF;
         GBufferFTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferFTexDesc.Width     = gWidth;
-        GBufferFTexDesc.Height    = gHeight;
+        GBufferFTexDesc.Width     = mWidth;
+        GBufferFTexDesc.Height    = mHeight;
         GBufferFTexDesc.MipLevels = 1;
         GBufferFTexDesc.Format    = gGBufferFormatF;
         GBufferFTexDesc.Usage     = USAGE_DEFAULT;
@@ -804,8 +805,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc GBufferDepthTexDesc;
         GBufferDepthTexDesc.Name      = gStrGBufferDepth;
         GBufferDepthTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        GBufferDepthTexDesc.Width     = gWidth;
-        GBufferDepthTexDesc.Height    = gHeight;
+        GBufferDepthTexDesc.Width     = mWidth;
+        GBufferDepthTexDesc.Height    = mHeight;
         GBufferDepthTexDesc.MipLevels = 1;
         GBufferDepthTexDesc.Format    = gGBufferFormatDepth;
         GBufferDepthTexDesc.Usage     = USAGE_DEFAULT;
@@ -817,8 +818,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc SSAOTexDesc;
         SSAOTexDesc.Name      = gStrSSAO;
         SSAOTexDesc.Type      = RESOURCE_DIM_TEX_2D;
-        SSAOTexDesc.Width     = gWidth;
-        SSAOTexDesc.Height    = gHeight;
+        SSAOTexDesc.Width     = mWidth;
+        SSAOTexDesc.Height    = mHeight;
         SSAOTexDesc.MipLevels = 1;
         SSAOTexDesc.Format    = gSSAOFormat;
         SSAOTexDesc.Usage     = USAGE_DEFAULT;
@@ -831,8 +832,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc SSAOTexDesc1;
         SSAOTexDesc1.Name      = gStrSSAO;
         SSAOTexDesc1.Type      = RESOURCE_DIM_TEX_2D;
-        SSAOTexDesc1.Width     = gWidth;
-        SSAOTexDesc1.Height    = gHeight;
+        SSAOTexDesc1.Width     = mWidth;
+        SSAOTexDesc1.Height    = mHeight;
         SSAOTexDesc1.MipLevels = 1;
         SSAOTexDesc1.Format    = gSSAOFormat;
         SSAOTexDesc1.Usage     = USAGE_DEFAULT;
@@ -844,8 +845,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc TiledDepthDebugTextureDesc;
         TiledDepthDebugTextureDesc.Name      = gStrTiledDepthDebugTexture;
         TiledDepthDebugTextureDesc.Type      = RESOURCE_DIM_TEX_2D;
-        TiledDepthDebugTextureDesc.Width     = gWidth;
-        TiledDepthDebugTextureDesc.Height    = gHeight;
+        TiledDepthDebugTextureDesc.Width     = mWidth;
+        TiledDepthDebugTextureDesc.Height    = mHeight;
         TiledDepthDebugTextureDesc.MipLevels = 1;
         TiledDepthDebugTextureDesc.Format    = gTileDebugFormat;
         TiledDepthDebugTextureDesc.Usage     = USAGE_DEFAULT;
@@ -857,8 +858,8 @@ void Tutorial29_TBDR::CreateBuffer()
         TextureDesc DeferredLightingTextureDesc;
         DeferredLightingTextureDesc.Name      = gStrRenderSceneBuffer;
         DeferredLightingTextureDesc.Type      = RESOURCE_DIM_TEX_2D;
-        DeferredLightingTextureDesc.Width     = gWidth;
-        DeferredLightingTextureDesc.Height    = gHeight;
+        DeferredLightingTextureDesc.Width     = mWidth;
+        DeferredLightingTextureDesc.Height    = mHeight;
         DeferredLightingTextureDesc.MipLevels = 1;
         DeferredLightingTextureDesc.Format    = gRenderSceneBufferFormat;
         DeferredLightingTextureDesc.Usage     = USAGE_DEFAULT;
@@ -868,7 +869,7 @@ void Tutorial29_TBDR::CreateBuffer()
         m_TextureViews[gStrRenderSceneBufferSRV] = m_Textures[gStrRenderSceneBuffer]->GetDefaultView(TEXTURE_VIEW_SHADER_RESOURCE);
     }
 
-    { 
+    {
         // clang-format off
         float gScreenQuadPoints[] = {
 		    -1.0f, 3.0f, 0.5f, 0.0f, -1.0f,
@@ -1032,6 +1033,12 @@ void Tutorial29_TBDR::Initialize(const SampleInitInfo& InitInfo)
 {
     SampleBase::Initialize(InitInfo);
 
+    m_Camera.SetPos(gCamPos);
+    m_Camera.SetRotation(PI_F / 2.f, 0);
+    m_Camera.SetRotationSpeed(0.005f);
+    m_Camera.SetMoveSpeed(5.f);
+    m_Camera.SetSpeedUpScales(5.f, 10.f);
+
     InitLightData();
     CreatePipelineState();
     CreateBuffer();
@@ -1190,7 +1197,7 @@ void Tutorial29_TBDR::Render()
         m_ShaderResourceBindings[gStrSSAO]->GetVariableByName(SHADER_TYPE_PIXEL, "DepthGbuffer")->Set(m_TextureViews[gStrGBufferDepthSRV]);
         m_pImmediateContext->CommitShaderResources(m_ShaderResourceBindings[gStrSSAO], RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
 
-        
+
         {
             MapHelper<PassConstants> CBConstants(m_pImmediateContext, m_Buffers[gStrSSAOCameraCBV], MAP_WRITE, MAP_FLAG_DISCARD);
             *CBConstants = mPassCbData;
@@ -1212,8 +1219,8 @@ void Tutorial29_TBDR::Render()
             *CBConstants = mCbBlurSettings;
         }
         DispatchComputeAttribs DispatAttribs;
-        DispatAttribs.ThreadGroupCountX = (Uint32)ceilf(gWidth / 256.0f);
-        DispatAttribs.ThreadGroupCountY = (Uint32)gHeight;
+        DispatAttribs.ThreadGroupCountX = (Uint32)ceilf(mWidth / 256.0f);
+        DispatAttribs.ThreadGroupCountY = (Uint32)mHeight;
         m_ShaderResourceBindings[gStrHorzBlur]->GetVariableByName(SHADER_TYPE_COMPUTE, "InputTexture")->Set(m_TextureViews[gStrSSAOBufferSRV]);
         m_ShaderResourceBindings[gStrHorzBlur]->GetVariableByName(SHADER_TYPE_COMPUTE, "OutputTexture")->Set(m_TextureViews[gStrSSAOTempBufferUAV]);
         m_pImmediateContext->CommitShaderResources(m_ShaderResourceBindings[gStrHorzBlur], RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
@@ -1224,15 +1231,15 @@ void Tutorial29_TBDR::Render()
             MapHelper<CbBlurSettings> CBConstants(m_pImmediateContext, m_Buffers[gStrSSAOSettingVCBV], MAP_WRITE, MAP_FLAG_DISCARD);
             *CBConstants = mCbBlurSettings;
         }
-        DispatAttribs.ThreadGroupCountX = (Uint32)gWidth;
-        DispatAttribs.ThreadGroupCountY = (Uint32)ceilf(gHeight / 256.0f);
+        DispatAttribs.ThreadGroupCountX = (Uint32)mWidth;
+        DispatAttribs.ThreadGroupCountY = (Uint32)ceilf(mHeight / 256.0f);
         m_ShaderResourceBindings[gStrVertBlur]->GetVariableByName(SHADER_TYPE_COMPUTE, "InputTexture")->Set(m_TextureViews[gStrSSAOTempBufferSRV]);
         m_ShaderResourceBindings[gStrVertBlur]->GetVariableByName(SHADER_TYPE_COMPUTE, "OutputTexture")->Set(m_TextureViews[gStrSSAOBufferUAV]);
         m_pImmediateContext->CommitShaderResources(m_ShaderResourceBindings[gStrVertBlur], RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
         m_pImmediateContext->DispatchCompute(DispatAttribs);
     }
 
-    {   // TiledBaseLightCulling
+    { // TiledBaseLightCulling
         m_pImmediateContext->SetPipelineState(m_pPSOs[gStrTiledBaseLightCulling]);
         {
             MapHelper<PassConstants> CBConstants(m_pImmediateContext, m_Buffers[gStrCameraCBV], MAP_WRITE, MAP_FLAG_DISCARD);
@@ -1243,8 +1250,8 @@ void Tutorial29_TBDR::Render()
             *CBConstants = mLightCommonData;
         }
         DispatchComputeAttribs DispatAttribs;
-        DispatAttribs.ThreadGroupCountX = (Uint32)ceilf((float)gWidth / TILE_BLOCK_SIZE);
-        DispatAttribs.ThreadGroupCountY = (Uint32)ceilf((float)gHeight / TILE_BLOCK_SIZE);
+        DispatAttribs.ThreadGroupCountX = (Uint32)ceilf((float)mWidth / TILE_BLOCK_SIZE);
+        DispatAttribs.ThreadGroupCountY = (Uint32)ceilf((float)mHeight / TILE_BLOCK_SIZE);
         m_ShaderResourceBindings[gStrTiledBaseLightCulling]->GetVariableByName(SHADER_TYPE_COMPUTE, "DepthTexture")->Set(m_TextureViews[gStrGBufferDepthSRV]);
         m_ShaderResourceBindings[gStrTiledBaseLightCulling]->GetVariableByName(SHADER_TYPE_COMPUTE, "TiledDepthDebugTexture")->Set(m_TextureViews[gStrTiledDepthDebugTextureUAV]);
         m_pImmediateContext->CommitShaderResources(m_ShaderResourceBindings[gStrTiledBaseLightCulling], RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
@@ -1291,7 +1298,7 @@ void Tutorial29_TBDR::Render()
         m_pImmediateContext->Draw(DrawAttrsQuad);
     }
 
-    { // TAA 
+    { // TAA
         ITextureView*           pQuadRTVs[1] = {m_pSwapChain->GetCurrentBackBufferRTV()};
         SetRenderTargetsAttribs QuadRTAttrs;
         QuadRTAttrs.NumRenderTargets    = 1;
@@ -1308,6 +1315,10 @@ void Tutorial29_TBDR::Render()
         IBuffer*     pBuffs[] = {m_Buffers[gStrRenderSceneBuffer]};
         m_pImmediateContext->SetVertexBuffers(0, 1, pBuffs, &offset, RESOURCE_STATE_TRANSITION_MODE_TRANSITION, SET_VERTEX_BUFFERS_FLAG_RESET);
 
+        {
+            MapHelper<PassConstants> CBConstants(m_pImmediateContext, m_Buffers[gStrTAACBV], MAP_WRITE, MAP_FLAG_DISCARD);
+            *CBConstants = mPassCbData;
+        }
         m_pImmediateContext->SetPipelineState(m_pPSOs[gStrTAAPass]);
         m_ShaderResourceBindings[gStrTAAPass]->GetVariableByName(SHADER_TYPE_PIXEL, "ColorTexture")->Set(m_TextureViews[gStrRenderSceneBufferSRV]);
         m_ShaderResourceBindings[gStrTAAPass]->GetVariableByName(SHADER_TYPE_PIXEL, "PrevColorTexture")->Set(m_TextureViews[gStrRenderSceneBufferSRV]);
@@ -1360,6 +1371,13 @@ void Tutorial29_TBDR::Update(double CurrTime, double ElapsedTime)
 {
     SampleBase::Update(CurrTime, ElapsedTime);
 
+    m_Camera.Update(m_InputController, static_cast<float>(ElapsedTime));
+    {
+        const auto& mouseState = m_InputController.GetMouseState();
+        m_LastMouseState       = mouseState;
+    }
+
+#if 1
     float4x4 view = float4x4(1, 0, 0, 0,
                              0.00000000f, 0.819152057f, -0.573576450f, 0.00000000f,
                              0.00000000f, 0.573576450f, 0.819152057f, 0.00000000f,
@@ -1368,8 +1386,15 @@ void Tutorial29_TBDR::Update(double CurrTime, double ElapsedTime)
                              0.00000000f, 2.41421342f, 0.00000000f, 0.00000000f,
                              0.00000000f, 0.00000000f, 1.00100100f, 1.00000000f,
                              0.00000000f, 0.00000000f, -0.100100100f, 0.00000000f);
+    view          = view.Transpose();
+    proj          = proj.Transpose();
+ #else
+    float4x4 view = m_Camera.GetViewMatrix();
+    float4x4 proj = m_Camera.GetProjMatrix();
+
     view = view.Transpose();
     proj = proj.Transpose();
+#endif;
 
     mPassCbData.PreViewProj = mPassCbData.ViewProj;
     mPassCbData.View        = view;
@@ -1380,12 +1405,12 @@ void Tutorial29_TBDR::Update(double CurrTime, double ElapsedTime)
     mPassCbData.InvViewProj = mPassCbData.ViewProj.Inverse();
 
     mPassCbData.EyePosW          = gCamPos;
-    mPassCbData.RenderTargetSize = float4((float)gWidth, (float)gHeight, 1.0f / gWidth, 1.0f / gHeight);
+    mPassCbData.RenderTargetSize = float4((float)mWidth, (float)mHeight, 1.0f / mWidth, 1.0f / mHeight);
     mPassCbData.NearZ            = gCamearNear;
     mPassCbData.FarZ             = gCamearFar;
     mPassCbData.TotalTime        = 0;
     mPassCbData.DeltaTime        = 0;
-    mPassCbData.ViewPortSize     = {(float)gWidth, (float)gWidth, 0.0f, 0.0f};
+    mPassCbData.ViewPortSize     = {(float)mWidth, (float)mWidth, 0.0f, 0.0f};
 
     mMaterialData.DiffuseAlbedo = float4(1.0f);
     mMaterialData.FresnelR0     = float3(0.1f);
@@ -1395,7 +1420,7 @@ void Tutorial29_TBDR::Update(double CurrTime, double ElapsedTime)
     mMaterialData.ShadingModel  = 0;
 
     // ssao
-    mSSAOPass.gOcclusionRadius   = 0.03f;
+    mSSAOPass.gOcclusionRadius    = 0.03f;
     mSSAOPass.gOcclusionFadeStart = 0.01f;
     mSSAOPass.gOcclusionFadeEnd   = 0.03f;
     mSSAOPass.gSurfaceEpsilon     = 0.001f;
@@ -1404,10 +1429,19 @@ void Tutorial29_TBDR::Update(double CurrTime, double ElapsedTime)
     int  BlurRadius = (int)Weights.size() / 2;
 
     mCbBlurSettings.gBlurRadius = BlurRadius;
-    size_t DataSize       = Weights.size() * sizeof(float);
+    size_t DataSize             = Weights.size() * sizeof(float);
     memcpy_s(&(mCbBlurSettings.w0), DataSize, Weights.data(), DataSize);
 
     mDeferredLighting.EnableSSAO = 1;
+}
+
+void Tutorial29_TBDR::WindowResize(Uint32 Width, Uint32 Height)
+{
+    float NearPlane   = gCamearNear;
+    float FarPlane    = gCamearFar;
+    float AspectRatio = static_cast<float>(Width) / static_cast<float>(Height);
+    m_Camera.SetProjAttribs(NearPlane, FarPlane, AspectRatio, PI_F / 4.f,
+                            m_pSwapChain->GetDesc().PreTransform, m_pDevice->GetDeviceInfo().IsGLDevice());
 }
 
 } // namespace Diligent
