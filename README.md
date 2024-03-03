@@ -1,4 +1,4 @@
-# DiligentSamples <img src="https://github.com/DiligentGraphics/DiligentCore/blob/master/media/diligentgraphics-logo.png" height=64 align="right" valign="middle">
+# DiligentSamples 
 
 # Tutorials
 
@@ -49,7 +49,7 @@ Cube Map   SH(Spherical harmonic)   prt
 
 ## [Tutorial 36 - VXGI](Tutorials/Tutorial36_VXGI)
 
-目前还有一些问题
+![](Tutorials/Tutorial36_VXGI/Animation.gif)
 
 
 ## [Tutorial 37 - SDF](Tutorials/Tutorial37_SDF)
